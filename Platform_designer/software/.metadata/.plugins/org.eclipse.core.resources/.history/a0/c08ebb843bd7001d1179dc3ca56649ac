@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <altera_avalon_pio_regs.h>
+#include <sys/alt_alarm.h>
+#include <system.h>
+#include <string.h>
+#include <unistd.h>
+
+/*-------------------------------------------------------------*/
+void lcd_write(int data)
+{
+	IOWR_ALTERA_AVALON_PIO_DATA(LCD_BASE, data | 0b00100000000);
+	usleep(10000);
+	IOWR_ALTERA_AVALON_PIO_DATA(LCD_BASE, data & 0b11011111111);
+	usleep(10000);
+}
+void lcd_cmd(char cmd)
+{
+	lcd_write(0b00100000000 + cmd);
+}
+
+void lcd_data(char data) {
+	lcd_write(0b10100000000 + data);
+}
+void lcd_init()
+{
+	usleep(30000);
+//	lcd_cmd(0x38)
+	lcd_write(0b00100111000);
+	usleep(10000);
+//	lcd_cmd(0x0C)
+	lcd_write(0b00100001100);	// Display On/Off control
+	usleep(10000);
+//	lcd_cmd(0x06)
+	lcd_write(0b00100000110);   // Entry mode set
+	usleep(10000);
+//	lcd_cmd(0x01)
+	lcd_write(0b00100000001);   // Clear screen
+	usleep(30000);
+}
+
+
+
+void lcd_printtext(unsigned char string[]) {
+	for (int i = 0; i < strlen(string); i++)
+		lcd_data(string[i]);
+}
+
+/*Check code again*/
+void lcd_setcursor(char row, char col) {
+	int row_char = 0;
+	if (row == 1) row_char = 64;
+	lcd_cmd(0b00010000000 + row_char + col);
+}
+/*---------------------------------------------------------------*/
+
+void PrintHW(unsigned char string[]) {
+//	lcd_setcursor(0, 0);
+//	lcd_cmd(0x80);
+	lcd_printtext(string);
+}
+
+//void printLine2(){
+//	lcd_setcursor(1, 0);
+////	lcd_cmd(0x80);
+//	lcd_printtext("f: 1KHz DC:    %");
+//}
+
+
+
+/*----------------------------------------------------------------*/
+unsigned char text[]  = "Hello World !!!";
+unsigned char empty[] = "                ";
+unsigned char fp[]    = "f: 1KHz DC:    %";
+
+
+int main()
+{
+//	  static alt_alarm alarm;
+	  //unsigned short MOTOR_state = 0;
+
+	  while(1){
+	  if ((IORD_ALTERA_AVALON_PIO_DATA(SWITCH_BASE)&1)== 0X01)
+	  {
+		  IOWR_ALTERA_AVALON_PIO_DATA (LED_BASE, 0X08);
+		  printf("Hello from Nios II!\n");
+		  lcd_init();		// Init LCD
+		  lcd_setcursor(0,0);
+		  PrintHW(text);		// Print "Hello World!!!"
+	  }
+	  else
+	  {
+		  lcd_setcursor(0,0);
+		  PrintHW(empty);
+//		  lcd_cmd(0x01);
+
+	  }
+
+	  if (((IORD_ALTERA_AVALON_PIO_DATA(SWITCH_BASE) >> 1) & 1) == 1) {
+
+//		  	printLine2();
+		    lcd_setcursor(1,0);
+		  	PrintHW(fp);
+
+	  		IOWR_ALTERA_AVALON_PIO_DATA(MOTOR_BASE, 1);
+	  }
+	  else
+			  {
+		  IOWR_ALTERA_AVALON_PIO_DATA(MOTOR_BASE, 0);
+		  lcd_setcursor(1,0);
+		 		  PrintHW(empty);
+			  }
+
+
+  }
+//  return 0;
+}

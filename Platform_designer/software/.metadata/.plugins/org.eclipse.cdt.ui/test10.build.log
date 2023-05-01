@@ -1,0 +1,9 @@
+10:51:33 **** Incremental Build of configuration Nios II for project test10 ****
+make all 
+Info: Building ../test10_bsp/
+D:/Quartus/Setup/nios2eds/bin/gnu/H-x86_64-mingw32/bin/make --no-print-directory -C ../test10_bsp/
+[BSP build complete]
+[test10 build complete]
+
+10:51:34 Build Finished (took 873ms)
+
