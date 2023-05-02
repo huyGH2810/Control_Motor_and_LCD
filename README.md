@@ -1,6 +1,6 @@
 # Control_Motor_and_LCD
 
-Build a system using Nios II in kit DE10 to connect a LCD16x2andan H-bridge to control a motor. This system can do the following tasks:
+Build a system using Nios II in kit DE10 to connect a LCD 16x2 and an H-bridge to control a motor. This system can do the following tasks:
 + When SW0 is ON, LCD blinks the sentence “Hello World !!!” in the middle of row 1 with frequency 1Hz. (Using timer)
 + When SW1 is ON, Nios II controls the motor by sending PWM pulses to the H-bridge. LCD displays the duty cycle and the frequency of PWM pulses. 
 + When SW0 and SW1 are OFF, turn off 
